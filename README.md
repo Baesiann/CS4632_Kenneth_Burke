@@ -2,27 +2,30 @@
 
 ## Overview
 
-### Domain:
-Service industry- specifically, coffee shop operations and staffing efficiency.
+### Domain
+Service industry — specifically, coffee shop operations and staffing efficiency.
 
-### Problem Statement: 
+### Problem Statement
 This simulation addresses the question: How should resources (staffing, skill allocation, and scheduling) be allocated to maximize profits in a cafe environment, while balancing customer satisfaction and staff utilization?
 
-### Scope: 
-The simulation will focus on customer arrivals, order processing, staff scheduling, and profit optimization. 
-We will not simulate:
--Supply chain logistics (ingredient restocking, vendor relationships)
--Long-term customer loyalty trends outside of a single day
--External events, such as marketing campaigns, weather effects, or competition
--Costs of overhead outside of labor (i.e., rent, utilities)
+### Scope
+The simulation will focus on customer arrivals, order processing, staff scheduling, and profit optimization.  
 
-Though we will be simulating
--Bursts of customer arrivals
--Menu complexity (different categories with varying service times)
--Customer abandonment
--Adaptive scheduling based on performance metrics
+**We will not simulate:**
+- Supply chain logistics (ingredient restocking, vendor relationships)
+- Long-term customer loyalty trends outside of a single day
+- External events, such as marketing campaigns, weather effects, or competition
+- Costs of overhead outside of labor (i.e., rent, utilities)
 
+**We will simulate:**
+- Bursts of customer arrivals
+- Menu complexity (different categories with varying service times)
+- Customer abandonment
+- Adaptive scheduling based on performance metrics
 
+## Project Structure
+
+```
 cafe-optimization-simulation/
 ├── README.md                  # Project overview and instructions
 ├── .gitignore                 # Ignored files (Python cache, envs, etc.)
@@ -41,3 +44,4 @@ cafe-optimization-simulation/
 │   ├── ClassUML.png
 │   └── ActivityUML.png
 └── notebooks/                 # Jupyter Testing
+```
