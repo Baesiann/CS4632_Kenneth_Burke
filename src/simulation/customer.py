@@ -1,7 +1,7 @@
 import simpy
 import pandas as pd
 import numpy as np
-from order import sample_order
+from simulation.order import sample_order
 
 # --- Arrival Cox Process ---
 def simulate_cox_process(T=480, dt=1):

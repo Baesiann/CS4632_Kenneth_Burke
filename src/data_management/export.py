@@ -1,0 +1,14 @@
+# Allows for saving simulation runs to a csv for further analysis
+
+import os
+
+def save_to_csv(df, filename):
+    # ensure we save inside cafe-simulation/data/
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+    collection_dir = os.path.join(base_dir, "data")
+    os.makedirs(collection_dir, exist_ok=True)   # make folder if missing
+
+    filepath = os.path.join(collection_dir, filename)
+    df.to_csv(filepath, index=False)
+    print(f"[+] Data saved to {filepath}")
+
