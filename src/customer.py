@@ -1,6 +1,7 @@
 import simpy
 import pandas as pd
 import numpy as np
+from order import sample_order
 
 # --- Arrival Cox Process ---
 def simulate_cox_process(T=480, dt=1):
@@ -23,25 +24,30 @@ def simulate_cox_process(T=480, dt=1):
 
 
 # --- Customer process ---
-def customer(env, customer_id, arrival_time, records):
-    yield env.timeout(arrival_time - env.now)  # wait until arrival time
-    records.append({"CustomerID": customer_id, "ArrivalTime": env.now})
+def customer(env, customer_id, arrival_time, baristas, records):
+    # Wait until arrival time
+    yield env.timeout(arrival_time - env.now)
 
+    arrival = env.now
 
-# --- Simulation ---
-def run_simulation():
-    env = simpy.Environment()
-    arrivals, times, baseline, stochastic_intensity = simulate_cox_process()
+    order_type, price, service_time = sample_order()
 
-    records = []
-    for cid, at in enumerate(arrivals, start=1):
-        env.process(customer(env, cid, at, records))
+    # Request a barista
+    with baristas.request() as req:
+        yield req  # wait until a barista is available
+        start_service = env.now
 
-    env.run(until=max(arrivals))  # run until last arrival
-    return pd.DataFrame(records), times, baseline, stochastic_intensity
+        yield env.timeout(service_time)
+        end_service = env.now
 
-
-# --- Run ---
-df, times, baseline, stochastic_intensity = run_simulation()
-print(df.head())
-print(f"Total customers: {len(df)}")
+        records.append({
+            "CustomerID": customer_id,
+            "OrderType": order_type,
+            "Price" : price,
+            "ArrivalTime": arrival,
+            "StartService": start_service,
+            "EndService": end_service,
+            "WaitTime": start_service - arrival,
+            "ServiceTime": service_time,
+            "TotalTime": end_service - arrival
+        })
