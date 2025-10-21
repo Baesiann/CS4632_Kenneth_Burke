@@ -16,23 +16,27 @@ class ScheduleManager:
         self.w_idle = 0.5   # Idle barista penalty
         self.w_throughput = 2.0 # Throughput reward
         self.w_labor = 1.0  # Per barista penalty
+        self.w_dropped = 3.0    # Drop penalty
 
     def evaluate_cost(self, df, num_baristas):
         # Compute cost function from simulation data
         avg_wait = average_wait_time(df)
         avg_throughput = throughput(df, self.day_length)
         idle_time = barista_idle_time(df, num_baristas, self.day_length)
+        dropout_count = df["Dropped"].sum() if "Dropped" in df.columns else 0
 
         # Normalized metrics
         norm_weight = avg_wait / 10.0
         norm_idle = idle_time / (self.day_length * num_baristas)
         norm_throughput = avg_throughput / 10.0
+        norm_dropped = dropout_count / 10.0
 
         cost = (
             self.w_wait * norm_weight + 
             self.w_idle * norm_idle +
             self.w_labor * num_baristas - 
-            self.w_throughput * norm_throughput
+            self.w_throughput * norm_throughput +
+            self.w_dropped * norm_dropped
         )
         return cost
     

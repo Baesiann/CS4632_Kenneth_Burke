@@ -16,3 +16,8 @@ def barista_idle_time(df, num_baristas, day_length=480):
     total_capacity_time = num_baristas * day_length
     idle_time = max(0, total_capacity_time - total_service_time)
     return idle_time
+
+def total_dropped(df):
+    if "Dropped" in df.columns:
+        return df["Dropped"].sum()
+    return 0

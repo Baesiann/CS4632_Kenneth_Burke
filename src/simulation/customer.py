@@ -32,13 +32,19 @@ def customer(env, customer_id, arrival_time, baristas, records):
 
     order_type, price, service_time = sample_order()
 
-    # Request a barista
+    # Addition of customer patience: normal distribution of 9 minutes
+    patience = np.random.normal(loc=9, scale=2)
+
+    # Request a barista / timeout if patience out
     with baristas.request() as req:
-        yield req  # wait until a barista is available
+        results = yield req | env.timeout(patience)  # wait until a barista is available
         start_service = env.now
 
-        yield env.timeout(service_time)
-        end_service = env.now
+        # in the case customer left
+        dropped = req not in results
+
+        service_time_actual = 0 if dropped else service_time
+        end_service = start_service + service_time_actual if not dropped else start_service
 
         records.append({
             "CustomerID": customer_id,
@@ -49,5 +55,6 @@ def customer(env, customer_id, arrival_time, baristas, records):
             "EndService": end_service,
             "WaitTime": start_service - arrival,
             "ServiceTime": service_time,
-            "TotalTime": end_service - arrival
+            "TotalTime": end_service - arrival,
+            "Dropped": dropped
         })

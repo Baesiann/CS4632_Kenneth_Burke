@@ -6,7 +6,7 @@ from simulation.customer import customer
 from simulation.barista import setup_baristas
 from simulation.customer import simulate_cox_process
 from data_management.collector import DataCollector
-from data_management.metrics import average_wait_time, total_revenue, throughput
+from data_management.metrics import average_wait_time, total_revenue, throughput, total_dropped
 from data_management.export import save_to_csv
 from simulation.schedule_manager import ScheduleManager
 
@@ -37,6 +37,19 @@ if __name__ == "__main__":
         collector = DataCollector()
 
         df, times = run_simulation_day(env, schedule_manager.current_baristas, collector)
+
+        # Compute & print daily metrics
+        avg_wait = average_wait_time(df)
+        rev = total_revenue(df)
+        thpt = throughput(df, total_time=480)
+        drop_count = total_dropped(df)
+
+        print(f"Day {day} Summary:")
+        print(f" - Average Wait Time: {avg_wait:.2f} min")
+        print(f" - Total Revenue: ${rev:.2f}")
+        print(f" - Throughput: {thpt:.2f} customers/min")
+        print(f" - Dropped: {drop_count} Customers")
+
         all_days_data.append(df)
 
         # Call the optimizer for next day
