@@ -7,8 +7,10 @@ def average_service_time(df):
 def total_revenue(df):
     return df["Price"].sum()
 
+# Should not count dropped customers
 def throughput(df, total_time):
-    return len(df) / total_time  # customers per minute
+    served_customers = df.loc[~df["Dropped"]]
+    return len(served_customers) / total_time  # customers per minute
 
 # Added approximation of idle time
 def barista_idle_time(df, num_baristas, day_length=480):

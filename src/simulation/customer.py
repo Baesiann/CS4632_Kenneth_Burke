@@ -38,13 +38,16 @@ def customer(env, customer_id, arrival_time, baristas, records):
     # Request a barista / timeout if patience out
     with baristas.request() as req:
         results = yield req | env.timeout(patience)  # wait until a barista is available
-        start_service = env.now
-
-        # in the case customer left
-        dropped = req not in results
-
-        service_time_actual = 0 if dropped else service_time
-        end_service = start_service + service_time_actual if not dropped else start_service
+        
+        if req in results:  # Customer got a barista
+            start_service = env.now
+            yield env.timeout(service_time)
+            end_service = env.now
+            dropped = False
+        else:   # Customer left
+            start_service = None
+            end_service = None
+            dropped = True
 
         records.append({
             "CustomerID": customer_id,
@@ -53,8 +56,8 @@ def customer(env, customer_id, arrival_time, baristas, records):
             "ArrivalTime": arrival,
             "StartService": start_service,
             "EndService": end_service,
-            "WaitTime": start_service - arrival,
-            "ServiceTime": service_time,
-            "TotalTime": end_service - arrival,
+            "WaitTime": (start_service - arrival) if start_service is not None else patience,
+            "ServiceTime": service_time if start_service is not None else 0,
+            "TotalTime": (end_service - arrival) if end_service is not None else patience,
             "Dropped": dropped
         })
