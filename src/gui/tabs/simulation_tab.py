@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 import random
 
+from components.treev import EditableTreeview
+
 # importing ORDERS
 import sys, os
 sys.path.append("..")
@@ -98,24 +100,15 @@ class build_sim_tab(ttk.Frame):
         order_frame.columnconfigure((0, 1, 2, 3), weight=1)
 
         # Define columns
-        order_tree = ttk.Treeview(order_frame)
-        order_tree['columns'] = ("Drink", "Price", "Mean Service Time", "Standard Deviation of Service Time", "Drink Probability")
+        columns = ("Drink", "Price", "Mean Service Time", "Standard Deviation of Service Time", "Drink Probability")
+        order_tree = EditableTreeview(order_frame, ORDERS, columns=columns, show="headings", height=8)
 
         # Formulate columns
-        order_tree.column("#0", width=0, minwidth=25)   # I still don't know what this line does
-        order_tree.column("Drink", anchor="center", width=120)
-        order_tree.column("Price", anchor="center", width=120)
-        order_tree.column("Mean Service Time", anchor="center", width=120)
-        order_tree.column("Standard Deviation of Service Time", anchor="center", width=120)
-        order_tree.column("Drink Probability", anchor="center", width=120)
-
-        # Create Headings
-        order_tree.heading('#0', text="Label", anchor="w")
-        order_tree.heading("Drink", text="Drink", anchor="center")
-        order_tree.heading("Price", text="Price", anchor="center")
-        order_tree.heading("Mean Service Time", text="Avg. Service Time", anchor="center")
-        order_tree.heading("Standard Deviation of Service Time", text="Std. Service Time", anchor="center")
-        order_tree.heading("Drink Probability", text="Order Likeliness", anchor="center")
+        for col in columns:
+            order_tree.heading(col, text=col)
+            order_tree.column(col, anchor="center", width=120)
+        # Add to screen
+        order_tree.pack(fill="both", expand=True, padx=10, pady=10)
 
         # Populate Tree from ORDERS
         for cid, data in ORDERS.items():
@@ -124,12 +117,9 @@ class build_sim_tab(ttk.Frame):
                 data["price"],
                 data["mean_service"],
                 data["std_service"],
-                2
+                data["likeliness"]
                 )
             )
-
-        # Add to screen
-        order_tree.pack(pady=20)
 
         """ SAVE / CONTROL AREA """
         save_frame = ttk.Frame(parent, padding=10)
@@ -167,14 +157,19 @@ class build_sim_tab(ttk.Frame):
         self.days_var.set(5)
         self.baristas_var.set(2)
         self.seed_var.set(random.randint(1000000, 9999999))
-        self.arrival_rate_var.set(10.0)
-        self.arrival_var.set(2.0)
-        self.peak_hours_var.set("120, 300")
-        self.wait_weight_var.set(0.4)
-        self.idle_weight_var.set(0.3)
-        self.revenue_weight_var.set(0.3)
-        self.order_types_var.set("coffee,latte,espresso")
-        self.price_avg_var.set(4.5)
-        self.price_var_var.set(1.0)
+
+        self.baseline_rate_var.set(5.0)
+        self.morning_intensity_var.set(10.0)
+        self.lunch_intensity_var.set(8.0)
+        self.rand_intensity_var.set(2.0)
+        self.morning_dur_var.set(60)
+        self.lunch_dur_var.set(90)
+
+        self.wait_weight_var.set(1.0)
+        self.idle_weight_var.set(0.5)
+        self.barista_weight_var.set(1.0)
+        self.dropped_weight_var.set(3.0)
+        self.thpt_weight_var.set(2.0)
+        
         self.save_name_var.set("simulation_run")
 

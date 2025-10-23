@@ -1,0 +1,20 @@
+{
+    "coffee": {
+        "price": 3.0,
+        "mean_service": 2,
+        "std_service": 0.5,
+        "likeliness": 5
+    },
+    "latte": {
+        "price": 4.5,
+        "mean_service": 4,
+        "std_service": 1,
+        "likeliness": 3
+    },
+    "frappuccino": {
+        "price": 6.0,
+        "mean_service": 6,
+        "std_service": 1.5,
+        "likeliness": 2
+    }
+}
