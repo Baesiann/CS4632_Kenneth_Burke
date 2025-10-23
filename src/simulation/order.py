@@ -12,7 +12,7 @@ def sample_order():
     # Randomly choose an order type with probability weights
     order_type = np.random.choice(
         list(ORDERS.keys()),
-        p=[0.5, 0.3, 0.2]  # probabilities (50% coffee, 30% latte, 20% frap)
+        p=[0.5, 0.3, 0.2]  # modified for gui expansion
     )
     order = ORDERS[order_type]
     # Draw a service time from normal distribution, clipped at >0

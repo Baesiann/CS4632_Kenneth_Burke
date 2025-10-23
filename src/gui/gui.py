@@ -1,0 +1,27 @@
+from tkinter import *
+from tkinter import ttk
+from tabs.simulation_tab import build_sim_tab
+from tabs.data_tab import build_data_tab
+
+class CafeSimGUI(Tk):
+    def __init__(self):
+        super().__init__()  # Initializes Tk
+        # Initialize the Window
+        self.title("Cafe Simulation")
+        self.geometry("1600x900")
+
+        # Notebook setup
+        self.notebook = ttk.Notebook(self)
+        self.notebook.pack(fill="both", expand=True, pady=15)
+
+        # Tabs, instantiated as objects, references kept
+        self.tab_sim = build_sim_tab(self.notebook)
+        self.tab_data = build_data_tab(self.notebook)
+
+        # Add tabs to notebook
+        self.notebook.add(self.tab_sim, text="Simulation Manager")
+        self.notebook.add(self.tab_data, text="Data Visualization")
+
+if __name__ == "__main__":
+    app = CafeSimGUI()
+    app.mainloop()
