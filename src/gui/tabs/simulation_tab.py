@@ -1,8 +1,10 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 import random
 
 from components.treev import EditableTreeview
+from data_management.export import save_to_csv, save_to_json
+from simulation.simulation_runner import run_full_simulation
 
 # importing ORDERS
 import sys, os
@@ -143,14 +145,33 @@ class build_sim_tab(ttk.Frame):
 
     def start_simulation(self):
         """Gather all user input and run the simulation."""
-        # TODO: connect to run_simulation_day() logic
-        print("Starting simulation with parameters:")
-        print({
-            "days": self.days_var.get(),
-            "baristas": self.baristas_var.get(),
-            "arrival_rate": self.arrival_rate_var.get(),
-            "cost_weights": (self.wait_weight_var.get(), self.idle_weight_var.get(), self.revenue_weight_var.get())
-        })
+        try:
+            params = self.collect_parameters()
+
+            print("Running simulation with parameters:", params)
+
+            # Run sim with collected parameters
+            results_df = run_full_simulation(**params)
+
+            # Build filename from entry box
+            filename = self.save_name_var.get().strip()
+            if not filename:
+                messagebox.showerror("Error", "Please enter a filename.")
+                return
+            
+            save_format = self.save_as.get()
+            if save_format == "csv":
+                save_to_csv(results_df, filename + ".csv")
+            elif save_format == "json":
+                save_to_json(results_df, filename + ".json")
+            else:
+                messagebox.showerror("Error", "Please select a file format.")
+                return
+            messagebox.showinfo("Success", f"Simulation completed and saved as {filename}.{save_format}")
+
+        except Exception as e:
+            messagebox.showerror("Simulation Error", f"An error occurred:\n{e}")
+            
 
     def reset_parameters(self):
         """Reset all parameters to default values."""
@@ -173,3 +194,22 @@ class build_sim_tab(ttk.Frame):
         
         self.save_name_var.set("simulation_run")
 
+    def collect_parameters(self):
+        return {
+            "num_days": self.days_var.get(),
+            "base_baristas": self.baristas_var.get(),
+            "seed": self.seed_var.get(),
+
+            "baseline_rate": self.baseline_rate_var.get(),
+            "morning_intensity": self.morning_intensity_var.get(),
+            "lunch_intensity": self.lunch_intensity_var.get(),
+            "rand_intensity": self.rand_intensity_var.get(),
+            "morning_dur": self.morning_dur_var.get(),
+            "lunch_dur": self.lunch_dur_var.get(),
+
+            "w_wait": self.wait_weight_var.get(),
+            "w_idle": self.idle_weight_var.get(),
+            "w_labor": self.barista_weight_var.get(),
+            "w_dropped": self.dropped_weight_var.get(),
+            "w_throughput": self.thpt_weight_var.get()
+        }

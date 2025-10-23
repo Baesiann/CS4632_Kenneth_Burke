@@ -4,15 +4,15 @@ import numpy as np
 from simulation.order import sample_order
 
 # --- Arrival Cox Process ---
-def simulate_cox_process(T=480, dt=1):
+def simulate_cox_process(T=480, dt=1, b_rate=5, m_int=10.0, l_int=8.0, rand_int=2.0, m_dur=60, l_dur=90):
     times = np.arange(0, T, dt)
 
     # Morning + lunch peaks (baseline intensity)
-    baseline = 5 + 10*np.exp(-((times-120)**2)/(2*60**2))  
-    baseline += 8*np.exp(-((times-300)**2)/(2*90**2))
+    baseline = b_rate + m_int*np.exp(-((times-120)**2)/(2*m_dur**2))  
+    baseline += l_int*np.exp(-((times-300)**2)/(2*l_dur**2))
 
     # Add randomness (Gamma distributed intensity)
-    stochastic_intensity = np.random.gamma(shape=2, scale=baseline/2)
+    stochastic_intensity = np.random.gamma(shape=rand_int, scale=baseline/2)
 
     # Generate arrivals
     arrivals = []

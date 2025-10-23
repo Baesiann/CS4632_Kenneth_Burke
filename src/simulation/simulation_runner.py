@@ -1,5 +1,6 @@
-# Driver program
+# Migrate driver logic from main.py
 
+# imports copied from main.py
 import simpy
 import pandas as pd
 from simulation.customer import customer
@@ -10,12 +11,19 @@ from data_management.metrics import average_wait_time, total_revenue, throughput
 from data_management.export import save_to_csv
 from simulation.schedule_manager import ScheduleManager
 
-# Number of simulation days (add to gui later)
-NUM_DAYS = 7
-
-def run_simulation_day(env, num_baristas, collector):
+# single day run copied from main.py
+def run_simulation_day(env, num_baristas, collector, **params):
     baristas = setup_baristas(env, num_baristas)
-    arrivals, times, baseline, stochastic_intensity = simulate_cox_process()
+    
+    # Pass arrival params to simulate_cox_process
+    arrivals, times, *_ = simulate_cox_process(
+        b_rate=params.get("baseline_rate", 5.0),
+        m_int=params.get("morning_intensity", 10.0),
+        l_int=params.get("lunch_intensity", 8.0),
+        rand_int=params.get("rand_intensity", 2.0),
+        m_dur=params.get("morning_dur", 60),
+        l_dur=params.get("lunch_dur", 90)
+    )
 
     # Spawn customers
     for cid, at in enumerate(arrivals, start=1):
@@ -26,17 +34,39 @@ def run_simulation_day(env, num_baristas, collector):
     # Convert to dataframe
     return collector.to_dataframe(), times
 
-if __name__ == "__main__":
-    schedule_manager = ScheduleManager(base_baristas=2)
+# full simulation run mostly copied from main
+# added functionality for seed, as well as parameters
+def run_full_simulation(
+        num_days=7,
+        base_baristas=2,
+        seed=None,
+        **params
+):
+    if seed:
+        import numpy as np
+        np.random.seed(seed)
+        import random
+        random.seed(seed)
+
+    # pass in params weights
+    schedule_manager = ScheduleManager(
+        base_baristas=base_baristas,
+        max_baristas=10,
+        w_wait=params.get("w_wait", 1.0),
+        w_idle=params.get("w_idle", 1.0),
+        w_labor=params.get("w_labor", 1.0),
+        w_dropped=params.get("w_dropped", 1.0),
+        w_throughput=params.get("w_throughput", 1.0)
+    )
     all_days_data = []
 
-    for day in range(1, NUM_DAYS + 1):
+    for day in range(1, num_days + 1):
         print(f"Simulating Day {day} with {schedule_manager.current_baristas} baristas")
 
         env = simpy.Environment()
         collector = DataCollector()
 
-        df, times = run_simulation_day(env, schedule_manager.current_baristas, collector)
+        df, times = run_simulation_day(env, schedule_manager.current_baristas, collector, **params)
 
         # Compute & print daily metrics
         avg_wait = average_wait_time(df)
@@ -56,7 +86,5 @@ if __name__ == "__main__":
         schedule_manager.optimize_schedule(df)
 
     # Combine all days
-    final_df = pd.concat(all_days_data, keys=[f"Day {i}" for i in range(1, NUM_DAYS + 1)])
-
-    # Use external save to csv
-    save_to_csv(final_df, "simulation_results.csv")
+    final_df = pd.concat(all_days_data, keys=[f"Day {i}" for i in range(1, num_days + 1)])
+    return final_df

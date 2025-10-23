@@ -1,5 +1,5 @@
 import numpy as np
-import json
+import json, os
 
 # Dictionary of orders with deviation
 ORDERS = {
@@ -8,8 +8,15 @@ ORDERS = {
     "frappuccino": {"price": 6.0, "mean_service": 6, "std_service": 1.5, "likeliness": 2},
 }
 
-with open("../data_management/orders.json") as f:
-    ORDERS = json.load(f)
+# Load orders from JSON (persistent)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_FILE = os.path.join(BASE_DIR, "../data_management/orders.json")
+DATA_FILE = os.path.normpath(DATA_FILE)
+if os.path.exists(DATA_FILE):
+    with open(DATA_FILE, "r") as file:
+        ORDERS = json.load(file)
+else:
+    print("orders.json not found")
 
 def sample_order():
     # Randomly choose an order type with probability weights
