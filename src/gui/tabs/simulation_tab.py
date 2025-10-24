@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import random
+import threading
 
 from components.treev import EditableTreeview
 from data_management.export import save_to_csv, save_to_json
