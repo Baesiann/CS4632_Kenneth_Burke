@@ -3,7 +3,7 @@ from tkinter import ttk, messagebox
 import random
 import time
 
-from components.treev import EditableTreeview
+from gui.components.treev import EditableTreeview
 from data_management.export import save_to_csv, save_to_json
 from simulation.simulation_runner import run_full_simulation
 

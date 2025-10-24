@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
-from tabs.simulation_tab import build_sim_tab
-from tabs.data_tab import build_data_tab
+from gui.tabs.simulation_tab import build_sim_tab
+from gui.tabs.data_tab import build_data_tab
 
 class CafeSimGUI(Tk):
     def __init__(self):
