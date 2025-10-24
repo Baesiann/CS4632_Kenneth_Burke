@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import random
+import time
 
 from components.treev import EditableTreeview
 from data_management.export import save_to_csv, save_to_json
@@ -145,6 +146,7 @@ class build_sim_tab(ttk.Frame):
     def start_simulation(self):
         """Gather all user input and run the simulation."""
         try:
+            start = time.time()
             params = self.collect_parameters()
 
             print("Running simulation with parameters:", params)
@@ -166,6 +168,9 @@ class build_sim_tab(ttk.Frame):
             else:
                 messagebox.showerror("Error", "Please select a file format.")
                 return
+            # End time
+            end = time.time()
+            print(f"Runtime: {end - start:.4f} seconds")
             messagebox.showinfo("Success", f"Simulation completed and saved as {filename}.{save_format}")
 
         except Exception as e:

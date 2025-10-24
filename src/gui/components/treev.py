@@ -62,8 +62,8 @@ class EditableTreeview(ttk.Treeview):
         region = self.identify("region", event.x, event.y)
         if region != "cell":
             return
-        row_id = self.identify(event.y)
-        col_id = self.identify(event.x)
+        row_id = self.identify_row(event.y)
+        col_id = self.identify_column(event.x)
         col_index = int(col_id[1:]) - 1     # '#1' -> 0, '#2' -> 1
 
         # Get current value and cell
@@ -99,7 +99,7 @@ class EditableTreeview(ttk.Treeview):
                 self._save_to_file()
 
         entry.bind("<Return>", save_edit)
-        entry.bind("<FocusOut", lambda e: entry.destroy())
+        entry.bind("<FocusOut>", lambda e: entry.destroy())
 
     # Adding new item to treeview and ORDERS
     def _add_item(self):
