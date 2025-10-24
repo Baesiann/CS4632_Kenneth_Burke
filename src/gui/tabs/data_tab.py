@@ -54,7 +54,7 @@ class build_data_tab(ttk.Frame):
             else:
                 self.df = pd.read_json(filepath)
 
-            # --- Data Preprocessing ---
+            """ Data Preprocessing """
             # Type conversion and cleanup
             self.df["Dropped"] = self.df["Dropped"].astype(bool)
             self.df["Price"] = self.df["Price"].astype(float)
@@ -62,10 +62,10 @@ class build_data_tab(ttk.Frame):
             self.df["WaitTime"] = self.df["WaitTime"].astype(float)
             self.df.dropna(subset=["ArrivalTime", "WaitTime"], inplace=True)
             
-            # === FINAL CORRECT DAY LOGIC: Only count a new day when CustomerID is 1 ===
+            # Only count a new day when CustomerID is 1
             self.df["Day"] = (self.df["CustomerID"] == 1).cumsum()
             
-            # --- CRITICAL FIX: LIMIT ANALYSIS TO THE FIRST 5 DAYS ---
+            # FIX: LIMIT ANALYSIS TO THE FIRST 5 DAYS
             self.df = self.df[self.df["Day"] <= 5].copy()
             
             # QueueExitTime calculation
@@ -93,14 +93,14 @@ class build_data_tab(ttk.Frame):
 
         n_days = self.df["Day"].max()
         
-        # --- 1. Daily Aggregation ---
+        # Daily Aggregation
         daily_metrics = self.df.groupby("Day").agg(
             AvgWaitTime=("WaitTime", "mean"),
             DroppedCustomers=("Dropped", "sum"),
             CustomerArrivals=("CustomerID", "count"),
         )
         
-        # Revenue Calculation (Serviced Customers only)
+        # Revenue Calculation
         serviced_df = self.df[self.df["Dropped"] == False].copy()
         revenue = serviced_df.groupby("Day")["Price"].sum().rename("Revenue")
         daily_metrics = daily_metrics.merge(revenue, left_index=True, right_index=True, how='left').fillna({'Revenue': 0})
@@ -116,7 +116,7 @@ class build_data_tab(ttk.Frame):
         daily_metrics.index.name = 'Day'
         daily_metrics = daily_metrics.reset_index()
 
-        # --- 2. Average Customers in Queue per Day ---
+        # Average Customers in Queue per Day
         total_length = int(n_days * self.DAY_LENGTH)
         queue_per_min = np.zeros(total_length)
         
@@ -138,7 +138,7 @@ class build_data_tab(ttk.Frame):
         daily_metrics["AvgQueueSize"] = avg_queue_size
 
 
-        # --- 3. Plotting ---
+        # Plotting
         metrics_to_plot = {
             'AvgWaitTime': 'Average Wait Time (min) per Day',
             'Revenue': 'Total Revenue ($) per Day',
@@ -172,7 +172,7 @@ class build_data_tab(ttk.Frame):
             else:
                 ax.set_ylim(0, max_val * 1.1)
 
-            # Apply clean X-axis settings
+            # Apply X-axis settings
             ax.set_xticks(xticks)
             ax.set_xlim(0.5, total_days + 0.5)
             

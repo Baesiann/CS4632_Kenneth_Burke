@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import random
-import threading
 
 from components.treev import EditableTreeview
 from data_management.export import save_to_csv, save_to_json
@@ -11,7 +10,6 @@ from simulation.simulation_runner import run_full_simulation
 import sys, os
 sys.path.append("..")
 from simulation.order import ORDERS
-
 
 class build_sim_tab(ttk.Frame):
     def __init__(self, parent):
