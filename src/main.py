@@ -24,9 +24,9 @@ class CafeSimGUI(Tk):
         self.notebook.add(self.tab_data, text="Data Visualization")
 
 if __name__ == "__main__":
-    app = CafeSimGUI()
-    app.mainloop()
-
     ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     DATA_DIR = os.path.join(ROOT_DIR, "data")
     os.makedirs(DATA_DIR, exist_ok=True)
+
+    app = CafeSimGUI()
+    app.mainloop()
