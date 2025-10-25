@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from gui.tabs.simulation_tab import build_sim_tab
 from gui.tabs.data_tab import build_data_tab
+import os
 
 class CafeSimGUI(Tk):
     def __init__(self):
@@ -25,3 +26,7 @@ class CafeSimGUI(Tk):
 if __name__ == "__main__":
     app = CafeSimGUI()
     app.mainloop()
+
+    ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    DATA_DIR = os.path.join(ROOT_DIR, "data")
+    os.makedirs(DATA_DIR, exist_ok=True)
