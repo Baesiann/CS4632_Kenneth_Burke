@@ -1,6 +1,6 @@
 numpy
 simpy
-math
 random
 pandas
 tkinter
+matplotlib

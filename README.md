@@ -37,18 +37,31 @@ cafe-optimization-simulation/
 │   |  ├── __init__.py
 │   |  ├── barista.py          # Barista class and skill logic
 │   |  ├── order.py            # Order class (service duration, profit)
-│   |  └── customer.py         # Customer class and behaviors
-|   └── data_management/       # Data Collection
-│      ├── __init__.py         
-│      ├── collector.py        # Helper class for customer dictionary
-│      ├── export.py           # Helper class to export as CSV
-│      └── metrics.py          # Calculation of metrics
+│   |  ├── customer.py         # Customer class and behaviors
+│   |  ├── schedule_manager.py # Handles multi-day scheduling
+│   |  └── simulation_runner.py# Runs the daily simulation loop
+│   ├── data_management/       # Data Collection
+│   |  ├── __init__.py         
+│   |  ├── collector.py        # Helper class for customer dictionary
+│   |  ├── export.py           # Helper class to export as CSV
+│   |  └── metrics.py          # Calculation of metrics
+│   └── gui/                   # Tkinter GUI
+│       ├── __init__.py
+│       ├── components/        # Shared UI components
+│       │   ├── __init__.py
+│       │   └── treev.py       # Treeview component for displaying data
+│       └── tabs/              # GUI tab views
+│           ├── __init__.py
+│           ├── data_tab.py    # Handles data generation interface
+│           └── simulation_tab.py # Runs and visualizes simulation output
 ├── docs/                      # Documentation, diagrams, proposal PDFs
 │   ├── CS4632_Kenneth_Burke_M1.pdf
-|   ├── CS4632_Kenneth_Burke_M2.pdf
+│   ├── CS4632_Kenneth_Burke_M2.pdf
+│   ├── CS4632_Kenneth_Burke_M3.pdf
 │   ├── ClassUML.png
 │   └── ActivityUML.png
 └── notebooks/                 # Jupyter Testing
+    └── doubly_stochastic.ipynb
 ```
 
 ### Project Status
@@ -68,7 +81,7 @@ cafe-optimization-simulation/
 1. Clone the repository
 ```bash
 git clone https://github.com/Baesiann/CS4632_Kenneth_Burke
-cd root-folder
+cd CS4632_Kenneth_Burke
 ```
 2. Install dependencies
 ```
@@ -77,7 +90,7 @@ pip install -r requirements.txt
 ### Usage
 Run the application from the project root directory
 ```
-python main.py
+python src/main.py
 ```
 
 ## Arcitecture Overview
