@@ -4,6 +4,7 @@ import sys, os, json
 #Import base ORDERS as a default
 sys.path.append("..")
 from simulation.order import ORDERS as DEFAULT_ORDERS
+from simulation.customer import calc_patience
 
 # Load orders from JSON (persistent)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -120,6 +121,10 @@ class EditableTreeview(ttk.Treeview):
         # Update ORDERS
         self.data[drink] = {"price": price, "mean_service": avg, "std_service": std, "likeliness": like}
 
+        # Recalculate customer patience stats
+        print(f"Average mean service time across orders: {calc_patience():.2f} minutes")
+        print(f"Average patience time modeled as ~ N({calc_patience() * 2.5:.2f}, {calc_patience() * 0.5:.2f}) minutes")
+
         # Add to treeview
         self.insert("", "end", values=(drink, price, avg, std, like))
 
@@ -155,6 +160,9 @@ class EditableTreeview(ttk.Treeview):
 
         self._save_to_file()
         print("Deleted items, updated ORDERS:", self.data)
+        # Recalculate customer patience stats
+        print(f"Average mean service time across orders: {calc_patience():.2f} minutes")
+        print(f"Average patience time modeled as ~ N({calc_patience() * 2.5:.2f}, {calc_patience() * 0.5:.2f}) minutes")
 
     def _save_to_file(self):
         # Write current dict back into orders.json

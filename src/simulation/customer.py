@@ -1,7 +1,22 @@
 import simpy
 import pandas as pd
 import numpy as np
-from simulation.order import sample_order
+from simulation.order import sample_order, ORDERS
+
+
+def calc_patience():
+    """
+    Calculate customer patience based on order statistics.
+    Here we use a normal distribution centered around
+    2.5 times the average mean service time, with std dev
+    as 0.5 times the average mean service time.
+    """
+
+    mean_service_times = [v["mean_service"] for v in ORDERS.values()]
+    likeliness_weights = [v["likeliness"] for v in ORDERS.values()]
+    AVG_MEAN_SERVICE = np.average(mean_service_times, weights=likeliness_weights)
+
+    return AVG_MEAN_SERVICE
 
 # --- Arrival Cox Process ---
 def simulate_cox_process(T=480, dt=1, b_rate=5, m_int=10.0, l_int=8.0, rand_int=2.0, m_dur=60, l_dur=90):
@@ -32,8 +47,11 @@ def customer(env, customer_id, arrival_time, baristas, records):
 
     order_type, price, service_time = sample_order()
 
-    # Addition of customer patience: normal distribution of 9 minutes
-    patience = np.random.normal(loc=9, scale=2)
+    # Customer patience based on drink service stats
+    patience = np.random.normal(
+        loc=calc_patience() * 2.5,
+        scale=calc_patience() * 0.5
+    )
 
     # Request a barista / timeout if patience out
     with baristas.request() as req:

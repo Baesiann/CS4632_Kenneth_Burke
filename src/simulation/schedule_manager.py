@@ -1,67 +1,78 @@
 # Oversee multi-day simulation planning. Determines # of baristas and hours
 # Adapts based on metrics
 
+import simpy
 import numpy as np
 from data_management.metrics import average_wait_time, throughput, barista_idle_time
+from data_management.collector import DataCollector
 
 class ScheduleManager:
-    def __init__(self, day_length=480,
-                base_baristas=2,
-                max_baristas=10,
-                w_wait=1,
-                w_idle=1,
-                w_labor=1,
-                w_dropped=1,
-                w_throughput=1):
-        self.base_baristas = base_baristas
+    """
+    Schedule manager that uses drop-only optimization.
+    It searches for the minimum number of baristas that produce
+    drop_count <= max_allowed_drops by running new simulations.
+    """
+
+    def __init__(
+        self,
+        simulate_func,
+        day_length=480,
+        base_baristas=2,
+        max_baristas=10,
+    ):
+        # store simulator to use inside optimize_schedule
+        self.simulate_func = simulate_func
+
         self.day_length = day_length
-        self.current_baristas = base_baristas
+        self.base_baristas = base_baristas
         self.max_baristas = max_baristas
+        self.max_allowed_drops = None
 
-        # cost weights used for cost minimization optimization
-        self.w_wait = w_wait   # Wait time penalty
-        self.w_idle = w_idle   # Idle barista penalty
-        self.w_throughput = w_throughput # Throughput reward
-        self.w_labor = w_labor  # Per barista penalty
-        self.w_dropped = w_dropped    # Drop penalty
+        # what driver uses as "current baristas"
+        self.current_baristas = base_baristas
 
-        # Internal targets for normalization
-        self.TARGET_AVG_WAIT = 5.0  # 5 min is target max penalty
-        self.TARGET_THROUGHPUT = 100.0  # This many customers a day for max reward
-        self.LABOR_BASE_COST = 5.0  # Base to labor cost meaningful (barista * 5)
-        self.TARGET_MAX_DROPPED = 10.0  # 10 customers dropped is max penalty
+        # Keep a history of barista counts
+        self.history = []
 
-    def evaluate_cost(self, df, num_baristas):
-        # Compute cost function from simulation data
-        avg_wait = average_wait_time(df)
-        avg_throughput = throughput(df, self.day_length)
-        idle_time = barista_idle_time(df, num_baristas, self.day_length)
-        dropout_count = df["Dropped"].sum() if "Dropped" in df.columns else 0
 
-        # Normalized metrics
-        norm_weight = min(avg_wait, 10.0)
-        norm_idle = idle_time / (self.day_length * num_baristas) * 10.0
-        norm_throughput = (avg_throughput / self.TARGET_THROUGHPUT) * 10.0
-        norm_dropped = (dropout_count / self.TARGET_MAX_DROPPED) * 10.0
-        labor_pen = num_baristas * self.LABOR_BASE_COST
+    def optimize_schedule(self, df_today, day_number=None):
+        """
+        Called by driver after today's df is generated.
+        We ignore today's df except for printing drops,
+        because optimal staffing is determined by running
+        multiple simulated scenarios internally.
+        """
 
-        cost = (
-            self.w_wait * norm_weight + 
-            self.w_idle * norm_idle +
-            self.w_labor * num_baristas - 
-            self.w_throughput * norm_throughput +
-            self.w_dropped * norm_dropped
-        )
-        return cost
-    
-    def optimize_schedule(self, df):
-        # Try different barista counts to minimize total cost
-        results = []
+        total_arrivals = len(df_today)
+        self.max_allowed_drops = int(0.01 * total_arrivals)
+        # today's drop count (for logging only)
+        today_drops = df_today["Dropped"].sum()
+        print(f"\nToday's dropped customers: {today_drops}")
+        print("Re-evaluating barista staffing for tomorrow...\n")
+
+        # Try 1..max_baristas
         for num in range(1, self.max_baristas + 1):
-            cost = self.evaluate_cost(df, num)
-            results.append((num, cost))
+            print(f"Testing {num} barista(s)...")
 
-        optimal_baristas, min_cost = min(results, key=lambda x: x[1])
-        self.current_baristas = optimal_baristas
-        print(f"Optimized next day staffing: {optimal_baristas} baristas (cost = {min_cost:.3f})")
-        return optimal_baristas
+            # We run a fresh single-day simulation internally
+            env = simpy.Environment()
+            collector = DataCollector()
+            df, _ = self.simulate_func(env, num, collector)
+
+            drop_count = df["Dropped"].sum()
+            print(f" -> Drops: {drop_count}")
+
+            if drop_count <= self.max_allowed_drops:
+                print(f" => Optimal staffing for tomorrow: {num} baristas\n")
+                self.current_baristas = num
+                if day_number is not None:
+                    self.history.append((day_number, num))
+                return num
+
+        # If even max baristas was not enough
+        print(
+            f"WARNING: Even {self.max_baristas} baristas exceed drop limit "
+            f"({self.max_allowed_drops}). Using max.\n"
+        )
+        self.current_baristas = self.max_baristas
+        return self.max_baristas

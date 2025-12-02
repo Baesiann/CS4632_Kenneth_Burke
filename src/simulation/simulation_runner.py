@@ -3,6 +3,7 @@
 # imports copied from main.py
 import simpy
 import pandas as pd
+from simulation import schedule_manager
 from simulation.customer import customer
 from simulation.barista import setup_baristas
 from simulation.customer import simulate_cox_process
@@ -49,15 +50,7 @@ def run_full_simulation(
         random.seed(seed)
 
     # pass in params weights
-    schedule_manager = ScheduleManager(
-        base_baristas=base_baristas,
-        max_baristas=10,
-        w_wait=params.get("w_wait", 1.0),
-        w_idle=params.get("w_idle", 1.0),
-        w_labor=params.get("w_labor", 1.0),
-        w_dropped=params.get("w_dropped", 1.0),
-        w_throughput=params.get("w_throughput", 1.0)
-    )
+    schedule_manager = ScheduleManager(run_simulation_day)
     all_days_data = []
 
     for day in range(1, num_days + 1):
@@ -80,10 +73,17 @@ def run_full_simulation(
         print(f" - Throughput: {thpt:.2f} customers/min")
         print(f" - Dropped: {drop_count} Customers")
 
+        # Store day and barista count in history
+        schedule_manager.history.append((day, schedule_manager.current_baristas))
+        schedule_manager.optimize_schedule(df)
+
         all_days_data.append(df)
 
-        # Call the optimizer for next day
-        schedule_manager.optimize_schedule(df)
+    print("\n==============================")
+    print("   SCHEDULE SUMMARY (FINAL)")
+    print("==============================")
+    for day, baristas in schedule_manager.history:
+        print(f"Day {day}: {baristas} baristas scheduled")
 
     # Combine all days
     final_df = pd.concat(all_days_data, keys=[f"Day {i}" for i in range(1, num_days + 1)])

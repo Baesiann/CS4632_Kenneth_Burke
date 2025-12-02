@@ -67,34 +67,34 @@ class build_sim_tab(ttk.Frame):
         self.lunch_dur_var = tk.IntVar(value=90)
         ttk.Entry(arrival_frame, textvariable=self.lunch_dur_var, width=8).grid(row=2, column=4)
 
-        """ COST WEIGHT SETUP FRAME """
-        cost_frame = ttk.LabelFrame(parent, text="Cost Weight Setup", padding=10)
-        cost_frame.grid(row=1, column=0, sticky="ew", pady=20, padx=20)
-        cost_frame.columnconfigure((0, 1, 2, 3), weight=1)
+        # """ COST WEIGHT SETUP FRAME """
+        # cost_frame = ttk.LabelFrame(parent, text="Cost Weight Setup", padding=10)
+        # cost_frame.grid(row=1, column=0, sticky="ew", pady=20, padx=20)
+        # cost_frame.columnconfigure((0, 1, 2, 3), weight=1)
 
-        # First Column: Penalties
-        ttk.Label(cost_frame, text="Wait Time Penalty Weight:").grid(row=0, column=0, sticky="w")
-        self.wait_weight_var = tk.DoubleVar(value=1.0)
-        ttk.Entry(cost_frame, textvariable=self.wait_weight_var, width=8).grid(row=0, column=1)
+        # # First Column: Penalties
+        # ttk.Label(cost_frame, text="Wait Time Penalty Weight:").grid(row=0, column=0, sticky="w")
+        # self.wait_weight_var = tk.DoubleVar(value=1.0)
+        # ttk.Entry(cost_frame, textvariable=self.wait_weight_var, width=8).grid(row=0, column=1)
 
-        ttk.Label(cost_frame, text="Idle Time Penalty Weight:").grid(row=1, column=0, sticky="w")
-        self.idle_weight_var = tk.DoubleVar(value=0.5)
-        ttk.Entry(cost_frame, textvariable=self.idle_weight_var, width=8).grid(row=1, column=1)
+        # ttk.Label(cost_frame, text="Idle Time Penalty Weight:").grid(row=1, column=0, sticky="w")
+        # self.idle_weight_var = tk.DoubleVar(value=0.5)
+        # ttk.Entry(cost_frame, textvariable=self.idle_weight_var, width=8).grid(row=1, column=1)
 
-        ttk.Label(cost_frame, text="Barista Count Penalty Weight:").grid(row=2, column=0, sticky="w")
-        self.barista_weight_var = tk.DoubleVar(value=1.0)
-        ttk.Entry(cost_frame, textvariable=self.barista_weight_var, width=8).grid(row=2, column=1)
+        # ttk.Label(cost_frame, text="Barista Count Penalty Weight:").grid(row=2, column=0, sticky="w")
+        # self.barista_weight_var = tk.DoubleVar(value=1.0)
+        # ttk.Entry(cost_frame, textvariable=self.barista_weight_var, width=8).grid(row=2, column=1)
 
-        ttk.Label(cost_frame, text="Dropped Customer Penalty Weight:").grid(row=3, column=0, sticky="w")
-        self.dropped_weight_var = tk.DoubleVar(value=3.0)
-        ttk.Entry(cost_frame, textvariable=self.dropped_weight_var, width=8).grid(row=3, column=1)
+        # ttk.Label(cost_frame, text="Dropped Customer Penalty Weight:").grid(row=3, column=0, sticky="w")
+        # self.dropped_weight_var = tk.DoubleVar(value=3.0)
+        # ttk.Entry(cost_frame, textvariable=self.dropped_weight_var, width=8).grid(row=3, column=1)
 
-        ttk.Separator(cost_frame, orient="vertical").grid(row=0, column=2, rowspan=4, sticky="ns", padx=10)
+        # ttk.Separator(cost_frame, orient="vertical").grid(row=0, column=2, rowspan=4, sticky="ns", padx=10)
 
-        # Second Column: Rewards
-        ttk.Label(cost_frame, text="Throughput Reward Weight:").grid(row=0, column=3, sticky="w")
-        self.thpt_weight_var = tk.DoubleVar(value=2.0)
-        ttk.Entry(cost_frame, textvariable=self.thpt_weight_var, width=8).grid(row=0, column=4)
+        # # Second Column: Rewards
+        # ttk.Label(cost_frame, text="Throughput Reward Weight:").grid(row=0, column=3, sticky="w")
+        # self.thpt_weight_var = tk.DoubleVar(value=2.0)
+        # ttk.Entry(cost_frame, textvariable=self.thpt_weight_var, width=8).grid(row=0, column=4)
 
         """ ORDER SETUP FRAME """
         order_frame = ttk.LabelFrame(parent, text="Order Setup", padding=10)
@@ -125,7 +125,7 @@ class build_sim_tab(ttk.Frame):
 
         """ SAVE / CONTROL AREA """
         save_frame = ttk.Frame(parent, padding=10)
-        save_frame.grid(row=2, column=0, sticky="nsew", pady=(15, 5), padx=30)
+        save_frame.grid(row=1, column=0, sticky="nsew", pady=(50, 5), padx=30)
         save_frame.columnconfigure((0, 1, 2), weight=1)
 
         ttk.Label(save_frame, text="Save Run As:").grid(row=0, column=0, sticky="e")
@@ -137,10 +137,10 @@ class build_sim_tab(ttk.Frame):
 
         """ BUTTONS """
         button_frame = ttk.Frame(parent, padding=10)
-        button_frame.grid(row=5, column=0, pady=(10, 0))
+        button_frame.grid(row=1, column=0, pady=(10, 0))
 
-        ttk.Button(button_frame, text="Start Simulation", command=self.start_simulation).grid(row=0, column=0, padx=10)
-        ttk.Button(button_frame, text="Reset Parameters", command=self.reset_parameters).grid(row=0, column=1, padx=10)
+        ttk.Button(button_frame, text="Start Simulation", command=self.start_simulation).grid(row=1, column=0, padx=10, sticky="n")
+        ttk.Button(button_frame, text="Reset Parameters", command=self.reset_parameters).grid(row=1, column=1, padx=10, sticky="n")
         
 
     def start_simulation(self):
@@ -190,11 +190,11 @@ class build_sim_tab(ttk.Frame):
         self.morning_dur_var.set(60)
         self.lunch_dur_var.set(90)
 
-        self.wait_weight_var.set(1.0)
-        self.idle_weight_var.set(0.5)
-        self.barista_weight_var.set(1.0)
-        self.dropped_weight_var.set(3.0)
-        self.thpt_weight_var.set(2.0)
+        # self.wait_weight_var.set(1.0)
+        # self.idle_weight_var.set(0.5)
+        # self.barista_weight_var.set(1.0)
+        # self.dropped_weight_var.set(3.0)
+        # self.thpt_weight_var.set(2.0)
         
         self.save_name_var.set("simulation_run")
 
@@ -209,11 +209,11 @@ class build_sim_tab(ttk.Frame):
             "lunch_intensity": self.lunch_intensity_var.get(),
             "rand_intensity": self.rand_intensity_var.get(),
             "morning_dur": self.morning_dur_var.get(),
-            "lunch_dur": self.lunch_dur_var.get(),
+            "lunch_dur": self.lunch_dur_var.get()
 
-            "w_wait": self.wait_weight_var.get(),
-            "w_idle": self.idle_weight_var.get(),
-            "w_labor": self.barista_weight_var.get(),
-            "w_dropped": self.dropped_weight_var.get(),
-            "w_throughput": self.thpt_weight_var.get()
+            # "w_wait": self.wait_weight_var.get(),
+            # "w_idle": self.idle_weight_var.get(),
+            # "w_labor": self.barista_weight_var.get(),
+            # "w_dropped": self.dropped_weight_var.get(),
+            # "w_throughput": self.thpt_weight_var.get()
         }
