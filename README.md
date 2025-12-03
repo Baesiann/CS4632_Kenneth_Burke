@@ -65,6 +65,7 @@ cafe-optimization-simulation/
 - User control of environment variables
 - Scheduling Optimization
 - Iteration of days
+
 **Still to come**
 - Skill level implementation (Efficiency of servers)
 - Hourly Analysis and Scheduling
@@ -86,36 +87,36 @@ python src/main.py
 ```
 
 ## Parameter Explanations
-The name of the save file of the simulation can be customized, and it supports .csv exports as well as .json exports through the radio buttons.
+ - The name of the save file of the simulation can be customized, and it supports .csv exports as well as .json exports through the radio buttons.
 ### Setup
 #### Simulation Days
-Number of days the simulation will run for
+ - Number of days the simulation will run for
 
 #### Starting Baristas
-The amount of baristas scheduled for the first day
+ - The amount of baristas scheduled for the first day
 
 #### Random Seed
-An option to use a seed to generate consistent random numbers
+ - An option to use a seed to generate consistent random numbers
 
 ### Customer Arrival
 #### Baseline arrival rate
-Customer per hour arrival rate
+ - Customer per hour arrival rate
 
 #### Randomness Intensity
-How harshly the realized rate of customer arrivals will differentiate from the baseline rate, value of 2 is suggested. Examples of what this actually mean will be presented below.
+ - How harshly the realized rate of customer arrivals will differentiate from the baseline rate, value of 2 is suggested. Examples of what this actually mean will be linked below.
 
 [Example Default Randomness (2)](docs/default_rand.png)
 
 [Example High Randomness (4)](docs/high_rand.png)
 
 #### Morning/Lunch Rush Intensity
-Sets the peak of the rush
+ - Sets the peak of the rush
 
 #### Morning/Lunch Rush Duration
-Sets the span of time that the rush will last for
+ - Sets the span of time that the rush will last for
 
 ## Order Setup
-A default set of orders is imported, though drinks can be added and removed through the interface, and the treeview's values can be edited by double clicking on a cell.
+ - A default set of orders is imported, though drinks can be added and removed through the interface, and the treeview's values can be edited by double clicking on a cell.
 
 ## Example Outputs
 ### Visualization of a default simulation run
