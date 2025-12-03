@@ -4,3 +4,4 @@ math
 random
 pandas
 tkinter
+matplotlib
