@@ -99,6 +99,10 @@ class EditableTreeview(ttk.Treeview):
                 self.data[item_name][key_map[col_index - 1]] = new_val
                 self._save_to_file()
 
+            # Recalculate customer patience stats
+            print(f"Average mean service time across orders: {calc_patience():.2f} minutes")
+            print(f"Average patience time modeled as ~ N({calc_patience() * 2.5:.2f}, {calc_patience() * 0.5:.2f}) minutes")
+
         entry.bind("<Return>", save_edit)
         entry.bind("<FocusOut>", lambda e: entry.destroy())
 
