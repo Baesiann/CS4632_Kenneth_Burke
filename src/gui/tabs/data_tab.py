@@ -66,7 +66,7 @@ class build_data_tab(ttk.Frame):
             self.df["Day"] = (self.df["CustomerID"] == 1).cumsum()
             
             # FIX: LIMIT ANALYSIS TO THE FIRST 5 DAYS
-            self.df = self.df[self.df["Day"] <= 5].copy()
+            # self.df = self.df[self.df["Day"] <= 5].copy()
             
             # QueueExitTime calculation
             self.df["QueueExitTime"] = np.where(

@@ -201,7 +201,7 @@ class build_sim_tab(ttk.Frame):
     def collect_parameters(self):
         return {
             "num_days": self.days_var.get(),
-            "base_baristas": self.baristas_var.get(),
+            # "base_baristas": self.baristas_var.get(),
             "seed": self.seed_var.get(),
 
             "baseline_rate": self.baseline_rate_var.get(),

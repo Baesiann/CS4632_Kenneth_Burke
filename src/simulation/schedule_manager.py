@@ -48,31 +48,31 @@ class ScheduleManager:
         # today's drop count (for logging only)
         today_drops = df_today["Dropped"].sum()
         print(f"\nToday's dropped customers: {today_drops}")
+        print(f"Maximum allowed drops for tomorrow: {self.max_allowed_drops}")
         print("Re-evaluating barista staffing for tomorrow...\n")
 
-        # Try 1..max_baristas
-        for num in range(1, self.max_baristas + 1):
-            print(f"Testing {num} barista(s)...")
+        # Determine tomorrow's staffing based on today's performance
+        current_staff = self.current_baristas
+        next_staff = current_staff
 
-            # We run a fresh single-day simulation internally
-            env = simpy.Environment()
-            collector = DataCollector()
-            df, _ = self.simulate_func(env, num, collector)
+        if today_drops > self.max_allowed_drops:
+            # Need to increase staffing
+            next_staff = min(current_staff + 1, self.max_baristas)
+            print(f"Increasing baristas from {current_staff} to {next_staff} due to high drops.\n")
 
-            drop_count = df["Dropped"].sum()
-            print(f" -> Drops: {drop_count}")
+        elif today_drops < 0.5 * self.max_allowed_drops and current_staff > self.base_baristas:
+            # Goal met, try reducing staff
+            next_staff = max(current_staff - 1, self.base_baristas)
+            print(f"Decreasing baristas from {current_staff} to {next_staff} due to low drops.\n")
+        
+        else:
+            print(f"Maintaining baristas at {current_staff}.\n")
+        
+        # update current baristas
+        self.current_baristas = next_staff
 
-            if drop_count <= self.max_allowed_drops:
-                print(f" => Optimal staffing for tomorrow: {num} baristas\n")
-                self.current_baristas = num
-                if day_number is not None:
-                    self.history.append((day_number, num))
-                return num
+        # record staffing that will be used tomorrow
+        if day_number is not None:
+            self.history.append((day_number, next_staff))
 
-        # If even max baristas was not enough
-        print(
-            f"WARNING: Even {self.max_baristas} baristas exceed drop limit "
-            f"({self.max_allowed_drops}). Using max.\n"
-        )
-        self.current_baristas = self.max_baristas
-        return self.max_baristas
+        return next_staff

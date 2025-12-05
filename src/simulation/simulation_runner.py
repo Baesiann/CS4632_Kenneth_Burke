@@ -50,16 +50,19 @@ def run_full_simulation(
         random.seed(seed)
 
     # pass in params weights
-    schedule_manager = ScheduleManager(run_simulation_day)
+    schedule_manager = ScheduleManager(simulate_func=run_simulation_day, base_baristas=base_baristas)
     all_days_data = []
 
+    schedule_manager.history.append((1, schedule_manager.current_baristas))
+
     for day in range(1, num_days + 1):
-        print(f"Simulating Day {day} with {schedule_manager.current_baristas} baristas")
+        staffing_today = schedule_manager.current_baristas
+        print(f"Simulating Day {day} with {staffing_today} baristas")
 
         env = simpy.Environment()
         collector = DataCollector()
 
-        df, times = run_simulation_day(env, schedule_manager.current_baristas, collector, **params)
+        df, times = run_simulation_day(env, staffing_today, collector, **params)
 
         # Compute & print daily metrics
         avg_wait = average_wait_time(df)
@@ -74,8 +77,9 @@ def run_full_simulation(
         print(f" - Dropped: {drop_count} Customers")
 
         # Store day and barista count in history
-        schedule_manager.history.append((day, schedule_manager.current_baristas))
-        schedule_manager.optimize_schedule(df)
+        # schedule_manager.history.append((day, staffing_today))
+        if day < num_days:
+            next_day_baristas = schedule_manager.optimize_schedule(df, day_number=day + 1)
 
         all_days_data.append(df)
 

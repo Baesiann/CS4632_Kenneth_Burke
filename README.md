@@ -217,3 +217,6 @@ Day 5: 2 baristas scheduled
 [+] Data saved to C:\dev\CS4632_Kenneth_Burke\data\simulation_run.csv
 Runtime: 0.0876 seconds
 ```
+
+#### Presentation
+https://youtu.be/MXwzDvYlBso
